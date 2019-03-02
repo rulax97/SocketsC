@@ -25,6 +25,7 @@ void error(const char *msg)
 }
 void Update()
 {
+  tipo = 'U';
   std::string x_str2(1, tipo);
   string x_str;
   do
@@ -37,18 +38,23 @@ void Update()
   cout<<"Ingresa el dato de medicion:"<<endl;
   cin>>datos;
   cin.ignore();
-    if(datos>=-99999.9 && datos<=999999.9)
+  if(datos>=-99999.9 && datos<=999999.9)
+  {
+    x_str = std::to_string(datos);
+    for(int i=0;i<8;i++) //Conversion a Char array.
     {
-      x_str = std::to_string(datos);
-      for(int i=0;i<8;i++)
-      {
-        array[i] = x_str[i];
-      }
-      for(int i=0;i<8;i++)
-      {
-        x_str[i]=array[i];
-      }
+      array[i] = x_str[i];
     }
+    for(int i=0;i<8;i++) //Conversion a string longitud 8.
+    {
+      x_str[i]=array[i];
+    }
+  }
+  else
+  {
+    error("No ingresaste un valor valido, prueba nuevamente.");
+    exit(0);
+  }
   do
   {
     cout<<"Ingresa la fecha:"<<endl;
@@ -62,11 +68,16 @@ void Update()
     cin.ignore();
   }while (tiempo.length()!=6);
   mensaje=x_str2+nombresensor+x_str+fecha+tiempo;
-  cout<<mensaje<<endl;
-  exit(0);
+  for(int y=0;y<mensaje.length();y++)
+  {
+    checksum = checksum + (int) mensaje[y];
+  }
+  std::string Schecksum = std::to_string(checksum);
+  mensaje=mensaje+Schecksum;
 }
 void Request()
 {
+  tipo = 'R';
   std::string x_s(1, tipo);
   do
   {
@@ -81,7 +92,12 @@ void Request()
     cin.ignore();
   }while (nombreobservador.length()!=8);
   mensaje2=x_s+nombreobservador+nombresensor2;
-  exit(0);
+  for(int w=0;w<mensaje2.length();w++)
+  {
+    checksum2 = checksum2 + (int) mensaje2[w];
+  }
+  std::string Schecksum2 = std::to_string(checksum2);
+  mensaje2=mensaje2+Schecksum2;
 }
 void menu()
 {
@@ -106,9 +122,9 @@ int main(int argc, char *argv[])
     int sockfd, portno, n;
     struct sockaddr_in serv_addr;
     struct hostent *server;
-
     char buffer[256];
-    if (argc < 3) {
+    if (argc < 3)
+    {
        fprintf(stderr,"usage %s hostname port\n", argv[0]);
        exit(0);
     }
@@ -117,7 +133,8 @@ int main(int argc, char *argv[])
     if (sockfd < 0)
         error("ERROR opening socket");
     server = gethostbyname(argv[1]);
-    if (server == NULL) {
+    if (server == NULL)
+    {
         fprintf(stderr,"ERROR, no such host\n");
         exit(0);
     }
@@ -129,10 +146,25 @@ int main(int argc, char *argv[])
     serv_addr.sin_port = htons(portno);
     if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0)
         error("ERROR connecting");
-    //menu();
-    bzero(buffer,256);
-    strncpy(buffer, "hi there", 8);
-
+    menu();
+    if(tipo=='U')
+    {
+      bzero(buffer,256);
+      char cstr[35];
+  	  strcpy(cstr, mensaje.c_str());
+      strncpy(buffer, cstr, 35);
+    }
+    else if(tipo=='R')
+    {
+      bzero(buffer,256);
+      char cstr2[21];
+  	  strcpy(cstr2, mensaje2.c_str());
+      strncpy(buffer, cstr2, 21);
+    }
+    else
+    {
+      exit(0);
+    }
     n = write(sockfd,buffer,strlen(buffer));
     if (n < 0)
          error("ERROR writing to socket");
