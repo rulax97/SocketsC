@@ -24,9 +24,8 @@ int main(int argc, char *argv[])
      struct sockaddr_in serv_addr, cli_addr;
      int n;
      ////////
-     string sensormsg,mktemp;
-     char csum[4];
-     int cksum;
+     string sensormsg,sensormsg2,mktemp,mktemp2,opcion,opcion2;
+     int cksum,cksum2;
      ////////
      if (argc < 2)
      {
@@ -48,35 +47,87 @@ int main(int argc, char *argv[])
      while ((newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen)) >= 0)
      {
        cksum=0;
+       cksum2=0;
+       sensormsg="";
+       sensormsg2="";
+       mktemp="";
+       mktemp2="";
+       opcion="";
+       opcion2="";
        if (newsockfd < 0)
             error("ERROR on accept");
        bzero(buffer,256);
        n = read(newsockfd,buffer,255);
-       if (n < 0) error("ERROR reading from socket");
-       printf("Sensor: %s\n",buffer);
-       //////////
+       if (n < 0)
+            error("ERROR reading from socket");
+       cout<<buffer<<endl;
        sensormsg = buffer;
-       for (int x=0;x<31;x++)//checksum del mensaje de 31 bytes.
+       sensormsg2 = buffer;
+       //////
+       if(buffer[0]=='U')
        {
-         cksum = cksum + (int)sensormsg[x];
+         opcion = sensormsg.substr(0,1);
        }
-       std::string compare = to_string(cksum);
-       mktemp = sensormsg.substr(31,4);
-       int l;
-       char ex[compare.size() + 1],ex2[mktemp.size() + 1];
-       strcpy(ex, compare.c_str());
-       strcpy(ex2, mktemp.c_str());
-       l = strcmp(ex,ex2);
-       if(l==0) //Comparacion de checksums (extraido del mensaje y comparado).
+       if(buffer[0]=='R')
        {
-         cout<<"Checksum correcto. El mensaje sera almacenado en CSV."<<endl;
+          opcion2 = sensormsg2.substr(0,1);
        }
-       else
+       //////
+       if(opcion=="U")
        {
-         cout<<"Checksum incorrecto. El mensaje no sera almacenado."<<endl;
+         sensormsg = buffer;
+         for (int x=0;x<31;x++)//checksum del mensaje de 31 bytes.
+         {
+           cksum = cksum + (int)sensormsg[x];
+         }
+         std::string compare = to_string(cksum);
+         mktemp = sensormsg.substr(31,4);
+         //Para la opcion de Update.
+         int l;
+         char ex[compare.size() + 1],ex2[mktemp.size() + 1];
+         strcpy(ex, compare.c_str());
+         strcpy(ex2, mktemp.c_str());
+         l = strcmp(ex,ex2);
+           if(l==0) //Comparacion de checksums (extraido del mensaje y comparado).
+           {
+             cout<<"Checksum correcto. El mensaje sera almacenado en Update CSV."<<endl;
+           }
+           else
+           {
+             cout<<"Checksum incorrecto. El mensaje no sera almacenado en Update CSV."<<endl;
+           }
        }
+      //Para la opcion de Request.
+      if(opcion2=="R")
+      {
+        sensormsg2 = buffer;
+        for (int x=0;x<17;x++)//checksum del mensaje de 17 bytes.
+        {
+          cksum2 = cksum2 + (int)sensormsg2[x];
+        }
+        std::string compare2 = to_string(cksum2);
+        mktemp2 = sensormsg2.substr(17,4);
+        int m;
+        char e[compare2.size() + 1];
+        char e2[mktemp2.size() + 1];
+        strcpy(e, compare2.c_str());
+        strcpy(e2, mktemp2.c_str());
+        m = strcmp(e,e2);
+          if(m==0) //Comparacion de checksums (extraido del mensaje y comparado).
+          {
+            cout<<"Checksum correcto. El mensaje sera almacenado en Request CSV."<<endl;
+          }
+          else
+          {
+            cout<<"Checksum incorrecto. El mensaje no sera almacenado en Request CSV."<<endl;
+          }
+      }
        ///////////
-       n = write(newsockfd,"I got your message",18);
+       n = write(newsockfd,"-Mensaje correcto-",18);
+       for(int o=0;o<256;o++)
+       {
+        buffer[o]='0';
+      }//Limpieza de buffer..
        if (n < 0) error("ERROR writing to socket");
      }
      close(newsockfd);
