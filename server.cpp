@@ -1,4 +1,5 @@
 #include <iostream>
+#include<fstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -91,6 +92,22 @@ int main(int argc, char *argv[])
            if(l==0) //Comparacion de checksums (extraido del mensaje y comparado).
            {
              cout<<"Checksum correcto. El mensaje sera almacenado en Update CSV."<<endl;
+             fstream fout;
+             fout.open("medicion.csv", ios::out | ios::app);
+             string s_tipo,s_nombresensor,s_dato,s_fecha,s_tiempo,s_checksum;
+             s_tipo=sensormsg.substr(0,1);
+             s_nombresensor=sensormsg.substr(1,8);
+             s_dato=sensormsg.substr(9,8);
+             s_tiempo=sensormsg.substr(17,6);
+             s_fecha=sensormsg.substr(23,8);
+             s_checksum=sensormsg.substr(31,4);
+             fout<< s_tipo << ","
+             << s_nombresensor << ","
+             << s_dato << ","
+             << s_tiempo << ","
+             << s_fecha << ","
+             << s_checksum
+             << "\n";
            }
            else
            {
@@ -116,6 +133,18 @@ int main(int argc, char *argv[])
           if(m==0) //Comparacion de checksums (extraido del mensaje y comparado).
           {
             cout<<"Checksum correcto. El mensaje sera almacenado en Request CSV."<<endl;
+            fstream fot;
+            fot.open("transaccion.csv", ios::out | ios::app);
+            string S_tipo,S_observer,S_sensorname,S_checksum;
+            S_tipo=sensormsg2.substr(0,1);
+            S_observer=sensormsg2.substr(1,8);
+            S_sensorname=sensormsg2.substr(9,8);
+            S_checksum=sensormsg.substr(17,4);
+            fot<< S_tipo << ","
+            << S_observer << ","
+            << S_sensorname << ","
+            << S_checksum
+            << "\n";
           }
           else
           {
@@ -127,7 +156,7 @@ int main(int argc, char *argv[])
        for(int o=0;o<256;o++)
        {
         buffer[o]='0';
-      }//Limpieza de buffer..
+       }//Limpieza de buffer.
        if (n < 0) error("ERROR writing to socket");
      }
      close(newsockfd);
