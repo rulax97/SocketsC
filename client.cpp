@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
     if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0)
         error("ERROR connecting");
     menu();
-    if(tipo=='U')
+    if(tipo=='U') 
     {
       bzero(buffer,256);
       char cstr[35];
