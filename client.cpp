@@ -57,17 +57,17 @@ void Update()
   }
   do
   {
-    cout<<"Ingresa la fecha:"<<endl;
-    cin>>fecha;
-    cin.ignore();
-  }while (fecha.length()!=8);
-  do
-  {
     cout<<"Ingresa el tiempo:"<<endl;
     cin>>tiempo;
     cin.ignore();
   }while (tiempo.length()!=6);
-  mensaje=x_str2+nombresensor+x_str+fecha+tiempo;
+  do
+  {
+    cout<<"Ingresa la fecha:"<<endl;
+    cin>>fecha;
+    cin.ignore();
+  }while (fecha.length()!=8);
+  mensaje=x_str2+nombresensor+x_str+tiempo+fecha;
   for(int y=0;y<mensaje.length();y++)
   {
     checksum = checksum + (int) mensaje[y];
@@ -81,16 +81,16 @@ void Request()
   std::string x_s(1, tipo);
   do
   {
-    cout<<"Ingresa el nombre del sensor:"<<endl;
-    cin>>nombresensor2;
-    cin.ignore();
-  }while(nombresensor2.length()!=8);
-  do
-  {
     cout<<"Ingresa el nombre del observante:"<<endl;
     cin>>nombreobservador;
     cin.ignore();
   }while (nombreobservador.length()!=8);
+  do
+  {
+    cout<<"Ingresa el nombre del sensor:"<<endl;
+    cin>>nombresensor2;
+    cin.ignore();
+  }while(nombresensor2.length()!=8);
   mensaje2=x_s+nombreobservador+nombresensor2;
   for(int w=0;w<mensaje2.length();w++)
   {
@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
     if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0)
         error("ERROR connecting");
     menu();
-    if(tipo=='U') 
+    if(tipo=='U')
     {
       bzero(buffer,256);
       char cstr[35];
