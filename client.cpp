@@ -41,14 +41,15 @@ void Update()
   if(datos>=-99999.9 && datos<=999999.9)
   {
     x_str = std::to_string(datos);
-    for(int i=0;i<8;i++) //Conversion a Char array.
+    x_str = x_str.substr(0,8);
+    /*for(int i=0;i<8;i++) //Conversion a Char array.
     {
       array[i] = x_str[i];
     }
     for(int i=0;i<8;i++) //Conversion a string longitud 8.
     {
       x_str[i]=array[i];
-    }
+    }*/
   }
   else
   {
@@ -74,6 +75,7 @@ void Update()
   }
   std::string Schecksum = std::to_string(checksum);
   mensaje=mensaje+Schecksum;
+  //exit(0);
 }
 void Request()
 {
